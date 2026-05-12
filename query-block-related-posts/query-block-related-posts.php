@@ -3,7 +3,7 @@
  * Plugin Name: Query Block Related Posts
  * Plugin URI: https://github.com/bradhogan/query-block-related-posts
  * Description: Extends the core Query Loop block with "Hide the current post" and "Show related posts".
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: Brad Hogan
  * Author URI: https://github.com/bradhogan
  * Text Domain: query-block-related-posts
@@ -84,7 +84,7 @@ final class Query_Block_Related_Posts {
 				'wp-components',
 				'wp-block-editor',
 			),
-			'1.0.0',
+			'1.1.0',
 			true
 		);
 	}
@@ -151,8 +151,9 @@ final class Query_Block_Related_Posts {
 			return $query;
 		}
 
-		$current_post_id = (int) self::$active_settings['current_post_id'];
-		$current_post    = get_post( $current_post_id );
+		$current_post_id   = (int) self::$active_settings['current_post_id'];
+		$current_post_type = self::$active_settings['current_post_type'];
+		$current_post      = get_post( $current_post_id );
 
 		if ( ! $current_post instanceof WP_Post ) {
 			return $query;
@@ -168,7 +169,7 @@ final class Query_Block_Related_Posts {
 		}
 
 		if ( ! empty( self::$active_settings['show_related'] ) ) {
-			$query['post_type'] = $current_post->post_type;
+			$query['post_type'] = $current_post_type;
 
 			$related_tax_query = self::build_related_tax_query( $current_post );
 
@@ -186,10 +187,34 @@ final class Query_Block_Related_Posts {
 						$related_tax_query,
 					);
 				}
+
+				if ( ! self::query_has_results( $query ) ) {
+					unset( $query['tax_query'] );
+				}
 			}
 		}
 
 		return $query;
+	}
+
+	/**
+	 * Check whether a query would return at least one result.
+	 *
+	 * @param array $query Query vars.
+	 * @return bool
+	 */
+	private static function query_has_results( $query ) {
+		$test_query = $query;
+		$test_query['fields'] = 'ids';
+		$test_query['posts_per_page'] = 1;
+		$test_query['no_found_rows'] = true;
+		$test_query['update_post_meta_cache'] = false;
+		$test_query['update_post_term_cache'] = false;
+		$test_query['ignore_sticky_posts'] = true;
+
+		$results = new WP_Query( $test_query );
+
+		return $results->have_posts();
 	}
 
 	/**
