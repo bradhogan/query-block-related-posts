@@ -1,11 +1,17 @@
 <?php
 /**
  * Plugin Name: Query Block Related Posts
+ * Plugin URI: https://github.com/bradhogan/query-block-related-posts
  * Description: Extends the core Query Loop block with "Hide the current post" and "Show related posts".
  * Version: 1.0.0
- * Author: Your Name
+ * Author: Brad Hogan
+ * Author URI: https://github.com/bradhogan
+ * Text Domain: query-block-related-posts
+ * Domain Path: /languages
  * Requires at least: 6.5
  * Requires PHP: 7.4
+ * License: GPL v2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
